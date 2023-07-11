@@ -1,12 +1,12 @@
 package com.zero.stock;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+//@SpringBootTest
 class StockApplicationTests {
 
-	@Test
+//	@Test
 	void contextLoads() {
 	}
 

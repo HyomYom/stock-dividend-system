@@ -9,6 +9,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,20 +17,26 @@ import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class YahooFinanceScraper {
+
+@Component
+public class YahooFinanceScraper implements Scraper {
 
     private static final String URL = "https://finance.yahoo.com/quote/%s/history?period1=%d&period2=%d&interval=1mo";
-    private static  final String UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.33 (KHTML, like Gecko) Chrome/27.0.1438.7";
+    private static final String SUMMARY_URL = "https://finance.yahoo.com/quote/%s?p=%s";
     private static final long START_TIME = 86400; // 60 * 60 * 24
+
+    @Override
     public ScrapedResult scrap(Company company) {
         var scrapResult = new ScrapedResult();
         scrapResult.setCompany(company);
         try {
             long end = System.currentTimeMillis() / 1000;
             String url = String.format(URL, company.getTicker(), START_TIME, end);
-            Connection connection = Jsoup.connect(url).userAgent(UA).timeout(10*1000);
-            Document document = connection.get();
+            Connection connection = Jsoup.connect(url);
 
+            Document document = connection.userAgent("Mozilla").get();
+            Elements elements = document.select("span.hidden-text");
+            System.out.println(elements);
             Elements parsingDivs = document.getElementsByAttributeValue("data-test", "historical-prices");
             Element tableEle = parsingDivs.get(0);
 
@@ -38,7 +45,7 @@ public class YahooFinanceScraper {
 
             for (Element e : tbody.children()) {
                 String txt = e.text();
-                if(!txt.endsWith("Dividend")){
+                if (!txt.endsWith("Dividend")) {
                     continue;
                 }
 
@@ -48,8 +55,8 @@ public class YahooFinanceScraper {
                 int year = Integer.valueOf(splits[2]);
                 String dividend = splits[3];
 
-                if(month < 0 ){
-                    throw  new RuntimeException("Unexpected Month enum value -> " + splits[0]);
+                if (month < 0) {
+                    throw new RuntimeException("Unexpected Month enum value -> " + splits[0]);
                 }
 
                 dividends.add(Dividend.builder()
@@ -57,7 +64,7 @@ public class YahooFinanceScraper {
                         .dividend(dividend)
                         .build());
             }
-            scrapResult.setDividendEntities(dividends);
+            scrapResult.setDividends(dividends);
 
         } catch (IOException e) {
             //TODO
@@ -65,5 +72,26 @@ public class YahooFinanceScraper {
         }
 
         return scrapResult;
+    }
+
+
+    @Override
+    public Company scrapCompanyByTicker(String ticker) { //회사명 스크래핑
+
+        String url = String.format(SUMMARY_URL, ticker, ticker);
+
+        try {
+            Document document = Jsoup.connect(url).get();
+            Element titleEle = document.getElementsByTag("h1").get(0);
+            System.out.println(titleEle);
+            String title = titleEle.text().split("-")[1].trim();
+
+            return Company.builder()
+                    .ticker(ticker)
+                    .name(title).build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

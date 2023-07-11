@@ -1,5 +1,6 @@
 package com.zero.stock.persist.entity;
 
+import com.zero.stock.model.Company;
 import io.lettuce.core.dynamic.annotation.CommandNaming;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,4 +23,9 @@ public class CompanyEntity {
     private String ticker;
 
     private String name;
+
+    public CompanyEntity(Company company) {
+        this.ticker = company.getTicker();
+        this.name = company.getName();
+    }
 }
