@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -31,12 +32,18 @@ public class FinanceService {
         // 3. 결과 조합 후 반환
 
         List<Dividend> dividends = new ArrayList<>();
+        dividendEntities.stream().map(
+                e -> Dividend.builder()
+                        .date(e.getDate())
+                        .dividend(e.getDividend())
+                        .build()
+        ).collect(Collectors.toList());
 
         return new ScrapedResult(
                 Company.builder()
                         .ticker(company.getTicker())
                         .name(company.getName())
-                        .build(),null
+                        .build(),dividends
         );
     }
 }

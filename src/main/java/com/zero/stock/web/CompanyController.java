@@ -21,7 +21,9 @@ public class CompanyController {
 
     @GetMapping("/autocomplete")
     public ResponseEntity<?> autocomplete(@RequestParam String keyword) {
-        return null;
+        var result = companyService.autoComplete(keyword);
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping //회사 조회
@@ -45,6 +47,7 @@ public class CompanyController {
 
         }
             Company company = this.companyService.save(ticker);
+            companyService.addAutocompleteKeyword(company.getName());
         return ResponseEntity.ok(company);
     }
 
