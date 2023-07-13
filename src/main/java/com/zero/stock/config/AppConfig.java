@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
-    @Bean
+    @Bean //자동 완성을 위한 Bean -> 메모리 사용이 크다.
     public Trie<String, String> trie(){
         return new PatriciaTrie<>();
     }
