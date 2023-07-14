@@ -4,6 +4,7 @@ package com.zero.stock.service;
 import com.zero.stock.model.Company;
 import com.zero.stock.model.Dividend;
 import com.zero.stock.model.ScrapedResult;
+import com.zero.stock.model.constants.CacheKey;
 import com.zero.stock.persist.CompanyRepository;
 import com.zero.stock.persist.DividendRepository;
 import com.zero.stock.persist.entity.CompanyEntity;
@@ -24,9 +25,9 @@ public class FinanceService {
     private final DividendRepository dividendRepository;
 
 
-    // 요청이 자주 들어오는가?
+    //요청이 자주 들어오는가?
     //자주 변경되는 데이터 인가?
-    @Cacheable(key = "#companyName", value = "finance")
+    @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
     public ScrapedResult getDividendByCompanyName(String companyName) {
 
         // 1. 회사명을 기준으로 회사 정보를 조회

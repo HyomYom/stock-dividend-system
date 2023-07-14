@@ -2,6 +2,7 @@ package com.zero.stock.persist.entity;
 
 import com.zero.stock.model.Company;
 import io.lettuce.core.dynamic.annotation.CommandNaming;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -12,6 +13,7 @@ import javax.persistence.*;
 @Getter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class CompanyEntity {
 
     @Id

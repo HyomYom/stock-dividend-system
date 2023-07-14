@@ -3,6 +3,7 @@ package com.zero.stock.scheduler;
 
 import com.zero.stock.model.Company;
 import com.zero.stock.model.ScrapedResult;
+import com.zero.stock.model.constants.CacheKey;
 import com.zero.stock.persist.CompanyRepository;
 import com.zero.stock.persist.DividendRepository;
 import com.zero.stock.persist.entity.CompanyEntity;
@@ -10,6 +11,8 @@ import com.zero.stock.persist.entity.DividendEntity;
 import com.zero.stock.scraper.Scraper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +20,7 @@ import java.util.List;
 
 
 @Slf4j // 로그기능
+@EnableCaching
 @Component
 @AllArgsConstructor
 public class ScraperScheduler {
@@ -25,7 +29,8 @@ public class ScraperScheduler {
     private final Scraper yahooFinanaceScraper;
 
 
-    //    @Scheduled(cron = "${scheduler.scrap.yahoo}")
+    @Scheduled(cron = "${scheduler.scrap.yahoo}")
+    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true) // 업데이트 시 캐시를 모두 삭제
     public void yahooFinanceScheduling() {
         log.info("scraping scheduler is started");
         // 저장된 회사 목록을 조회
