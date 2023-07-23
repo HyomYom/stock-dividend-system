@@ -1,8 +1,9 @@
 package com.zero.stock.service;
 
 
+import com.zero.stock.exception.impl.AlreadyExistUserException;
 import com.zero.stock.model.Auth;
-import com.zero.stock.model.MemberEntity;
+import com.zero.stock.persist.entity.MemberEntity;
 import com.zero.stock.persist.MemberRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Member;
 
 @Slf4j
 @Service
@@ -34,7 +34,7 @@ public class MemberService implements UserDetailsService {
     public MemberEntity register(Auth.SignUp member) {
         boolean exists = this.memberRepository.existsByUsername(member.getUsername());
         if (exists) {
-            throw new RuntimeException("이미 사용 중인 아이디 입니다.");
+            throw new AlreadyExistUserException();
         }
 
         member.setPassword(this.passwordEncoder.encode(member.getPassword()));
@@ -43,7 +43,15 @@ public class MemberService implements UserDetailsService {
         return result;
     }
 
-    public MemberEntity authenticate(Auth.SignIn signIn) {
-        return null;
+    public MemberEntity authenticate(Auth.SignIn member) {
+         var user = this.memberRepository.findByUsername(member.getUsername())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 ID 입니다."));
+
+         if(this.passwordEncoder.matches(member.getPassword(), user.getPassword())){
+             throw  new RuntimeException("비밀번호가 일치하지 않습니다.");
+         }
+
+
+        return user;
     }
 }

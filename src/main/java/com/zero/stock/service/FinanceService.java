@@ -1,6 +1,7 @@
 package com.zero.stock.service;
 
 
+import com.zero.stock.exception.impl.NoCompanyException;
 import com.zero.stock.model.Company;
 import com.zero.stock.model.Dividend;
 import com.zero.stock.model.ScrapedResult;
@@ -32,7 +33,7 @@ public class FinanceService {
 
         // 1. 회사명을 기준으로 회사 정보를 조회
         CompanyEntity company = companyRepository.findByName(companyName)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회사명입니다"));
+                .orElseThrow(() -> new NoCompanyException());
         // 2. 조회된 회사 ID 로 배당금을 조회
         List<DividendEntity> dividendEntities = dividendRepository.findAllByCompanyId(company.getId());
         // 3. 결과 조합 후 반환

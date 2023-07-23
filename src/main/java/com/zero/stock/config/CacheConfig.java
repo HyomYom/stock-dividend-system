@@ -24,7 +24,7 @@ public class CacheConfig {
     @Value("$spring.redis.host")
     private String host;
     @Value("${spring.redis.port")
-    private String port;
+    private int port;
 
 
     @Bean
@@ -45,7 +45,7 @@ public class CacheConfig {
 
         RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
         conf.setHostName(this.host);
-        conf.setPassword(this.port);
+        conf.setPort(this.port);
         return new LettuceConnectionFactory(conf);
     }
 }

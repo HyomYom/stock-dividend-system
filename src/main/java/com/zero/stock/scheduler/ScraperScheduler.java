@@ -30,7 +30,8 @@ public class ScraperScheduler {
 
 
     @Scheduled(cron = "${scheduler.scrap.yahoo}")
-    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true) // 업데이트 시 캐시를 모두 삭제
+    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true)
+    // 업데이트 시 캐시를 모두 삭제
     public void yahooFinanceScheduling() {
         log.info("scraping scheduler is started");
         // 저장된 회사 목록을 조회
@@ -48,7 +49,8 @@ public class ScraperScheduler {
                     .forEach(e -> {
                         boolean exitsts = dividendRepository.existsByCompanyIdAndDate(e.getCompanyId(), e.getDate());
                         if (!exitsts) {
-                            dividendRepository.save(e);
+                            this.dividendRepository.save(e);
+                            log.info("insert new dividend -> " + e.toString());
                         }
                     });
             // 연속적으로 스크래핑 대상 사이트 서버에 요청을 않도록 일시정지

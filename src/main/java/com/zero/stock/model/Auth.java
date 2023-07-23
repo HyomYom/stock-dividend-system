@@ -1,5 +1,6 @@
 package com.zero.stock.model;
 
+import com.zero.stock.persist.entity.MemberEntity;
 import lombok.Data;
 
 import java.util.List;

@@ -1,5 +1,6 @@
 package com.zero.stock.service;
 
+import com.zero.stock.exception.impl.NoCompanyException;
 import com.zero.stock.model.Company;
 import com.zero.stock.model.ScrapedResult;
 import com.zero.stock.persist.CompanyRepository;
@@ -7,7 +8,6 @@ import com.zero.stock.persist.DividendRepository;
 import com.zero.stock.persist.entity.CompanyEntity;
 import com.zero.stock.persist.entity.DividendEntity;
 import com.zero.stock.scraper.Scraper;
-import io.netty.util.internal.ObjectUtil;
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.Trie;
 import org.springframework.data.domain.Page;
@@ -77,6 +77,19 @@ public class CompanyService {
 
     public void deleteAutoCompleteKeyword(String keyword){
         trie.remove(keyword);
+    }
+
+    public String deleteCompany(String ticker){
+        var company = this.companyRepository.findByTicker(ticker)
+                .orElseThrow(() -> new NoCompanyException());
+
+        this.dividendRepository.deleteAllByCompanyId(company.getId());
+        this.companyRepository.delete((company));
+
+        this.deleteAutoCompleteKeyword((company.getName()));
+
+        return company.getName();
+
     }
 
 }
